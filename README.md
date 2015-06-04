@@ -18,7 +18,9 @@ It currently supports:
 
     * **esri-marker-content** - Attributes: none - text goes between tags 
 
+
 ![Esri Polymer Screenshot](https://raw.githubusercontent.com/JamesMilnerUK/esri-polymer/master/screenshot.png "Esri Polymer Screenshot")
+
 
 #
 #Getting Started
