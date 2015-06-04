@@ -41,7 +41,7 @@ For generating a web map from an ID:
 
 #Live Demo
 
-You can see a live demo [here](http://appsstage.esriuk.com/app/developerevangelist/93/wmt/view/d147785761984557b69c73adf4a8e2da/esri-polymer/esri-polymer.html "Esri Polymer Live Demo")
+You can see a live demo [here](http://appsstage.esriuk.com/app/developerevangelist/215/wmt/view/d147785761984557b69c73adf4a8e2da/esri-polymer/esri-polymer1.0/esri-polymer.html "Esri Polymer Live Demo")
 
 It displays one web map constructed using attributes (basemap, zoom, etc), with a feature layer web component nested inside it and a second map constructed with a web map ID.
 
