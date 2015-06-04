@@ -16,9 +16,9 @@ It currently supports:
 
     * **esri-marker-title** - Attributes: none -  text goes between tags
 
-    * **esri-marker-content** - Attributes: none - text goes between tags  return
-      return
-
+    * **esri-marker-content** - Attributes: none - text goes between tags  
+    
+#
 ![Esri Polymer Screenshot](https://raw.githubusercontent.com/JamesMilnerUK/esri-polymer/master/screenshot.png "Esri Polymer Screenshot")
 
 
