@@ -27,6 +27,7 @@ It currently supports:
 
 An example of using esri-polymer is shown in the esri-polymer.html page in the repository. Usage is as so:
 
+   ```html
     <esri-map basemap="dark-gray" centerLng="-0.122" centerLat="51.514" zoom="7">
         <esri-featurelayer featurelayer="http://services.arcgis.com/Qo2anKIAMzIEkIJB/arcgis/rest/services/TubeMap/FeatureServer/2"> </esri-featurelayer>
         <esri-marker lng="-0.5" lat="51.3">
@@ -34,11 +35,13 @@ An example of using esri-polymer is shown in the esri-polymer.html page in the r
             <esri-marker-content>Some Content</esri-marker-content>
         </esri-marker>
     </esri-map>
+     ```
     
 For generating a web map from an ID:
-
+   ```html
     <esri-map webMapId="8960fbd6893348709acac9e7a3b61f0c">
     </esri-map>
+    ```
     
 
 #Live Demo
