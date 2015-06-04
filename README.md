@@ -8,6 +8,7 @@ Feature Layers are supported, and come with a default popup which is just a list
 
 It currently supports:
 
+
 * **esri-map** - Attributes: basemap, zoom, centerLng, centerLat, webMapId (you can use a web map ID to pull through a map)
 
 * **esri-featurelayer** - Attributes: featurelayer (the feature service url)
@@ -18,11 +19,14 @@ It currently supports:
 
     * **esri-marker-content** - Attributes: none - text goes between tags  
 
- 
-![Esri Polymer Screenshot](https://raw.githubusercontent.com/JamesMilnerUK/esri-polymer/master/screenshot.png "Esri Polymer Screenshot")
 
 
-#
+![Esri Polymer Screenshot 1](https://raw.githubusercontent.com/JamesMilnerUK/esri-polymer/master/screenshot1.png "Esri Polymer Screenshot - Action Shot")
+
+![Esri Polymer Screenshot 2](https://raw.githubusercontent.com/JamesMilnerUK/esri-polymer/master/screenshot2.png "Esri Polymer Screenshot - DOM")
+
+
+
 #Getting Started
 
 An example of using esri-polymer is shown in the esri-polymer.html page in the repository. Usage is as so:
