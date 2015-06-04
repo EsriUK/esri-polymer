@@ -35,13 +35,14 @@ An example of using esri-polymer is shown in the esri-polymer.html page in the r
             <esri-marker-content>Some Content</esri-marker-content>
         </esri-marker>
     </esri-map>
-     ```
+   ```
     
 For generating a web map from an ID:
+
    ```html
     <esri-map webMapId="8960fbd6893348709acac9e7a3b61f0c">
     </esri-map>
-    ```
+   ```
     
 
 #Live Demo
