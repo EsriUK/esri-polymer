@@ -23,10 +23,11 @@
                         reflectToAttribute: true
                     }
                 },
-                
-            
-                ready : function() {
 
+
+                attached : function() {
+                    // ASYNC REQUIRED! -- https://github.com/Polymer/polymer/issues/1699
+                    this.async(function() {
                     console.log("Adding a marker to the map", Polymer.dom(this));
                     var markerlat = this.markerlat;
                     var markerlng = this.markerlng;
@@ -60,6 +61,8 @@
                             });
                         }
                     }
+
+                    })//end of async
 
                 }
             });  // End of Polymer

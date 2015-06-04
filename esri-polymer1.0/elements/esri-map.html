@@ -66,7 +66,7 @@
                 color: #000001;
                 border:none;
             }
-            
+
             input:focus {
                 outline:none;
             }
@@ -74,20 +74,20 @@
             .esriPopupWrapper {
                 font-family: 'Nunito', sans-serif !important;
             }
-            
+
         </style>
         <template>
-            
+
             <content></content>
-                <div class="esri-map-holder">
-                    <div class="esri-map-element">
-                        <div id={{mapId}} class="map-contents">
-                            <input title="Bounding Box" class="bounding-box" type="text" name="boundingbox" value="{{boundingBox::change}}">
-                            <input title="Zoom Level" class="esri-zoombox" type="text" name="zoom" value="{{zoom::change}}">
-                        </div>
+            <div class="esri-map-holder">
+                <div class="esri-map-element">
+                    <div id={{mapId}} class="map-contents">
+                        <input title="Bounding Box" class="bounding-box" type="text" name="boundingbox" value="{{boundingBox::change}}">
+                        <input title="Zoom Level" class="esri-zoombox" type="text" name="zoom" value="{{zoom::change}}">
                     </div>
                 </div>
-            
+            </div>
+
 
         </template>
 
@@ -115,7 +115,7 @@
                 is: "esri-map",
 
                 properties : {
-                    
+
                     mapId : {
                         type: String,
                         value : "map",
@@ -177,7 +177,7 @@
                         reflectToAttribute: false,
                         //notify : true
                     }
-                    
+
                 },
 
                 attached : function() {
@@ -203,11 +203,11 @@
                     // A necessary listener - see: https://github.com/webcomponents/webcomponentsjs#webcomponentsready
                     // Slso: https://github.com/Polymer/polymer/issues/1381
                     window.addEventListener('WebComponentsReady', function(e) {
-                                           
+
                     // Defining by Web Map ID - Check the web map Id is not undefined or blank
                     if (selectorId && webmapid) {
 
-                    
+
                         // Create map from web map ID
                         arcgisUtils.createMap(webmapid, selectorId, { minZoom: 2, maxZoom: 16 } ).then( function(returnedMap) {
                             // console.log("Initialising map");
@@ -219,19 +219,19 @@
                                 fl = context.map.getLayer(layerIds);
                                 context.defaultPopupFeatureLayer(fl);
                             }
-                            
+
                             returnedMap.map.setExtent(returnedMap.map.extent)
                             returnedMap.map.on( "extent-change", function(extentObject) {
                                 context.extent = extentObject.extent;
                             });
-                            
+
 
                         });
                     }
 
                     // Defining by HTML attributes
                     else if (selectorId && !webmapid) {
-                      
+
                         //console.log("Initialising map without webmapid", context.mapId );
                         context.map = new Map(selectorId, {
                             basemap: basemap,
@@ -245,19 +245,19 @@
                         context.map.on( "extent-change", function(extentObject) {
                             context.extent = extentObject.extent;
                         });
-                        
+
                     }
 
                     }); // end of WebComponentsReady
-                        
-                    
+
+
                 }, // end of ready
 
                 zoomChange: function(newZoom, oldZoom) {
 
-                    
+
                     if (newZoom && this.map && parseInt(newZoom) != parseInt(oldZoom) ) {
-                        
+
                         //console.log("MAX ZOOM", maxZoom, minZoom);
                         // If inputting from text box
                         if (typeof(newZoom) == "string") {
@@ -270,14 +270,14 @@
                 },
 
                 extentChange: function(newExtent, oldExtent) {
-                    
+
                     if (newExtent && this.map) {
-                    
+
                         var min = webMercatorUtils.webMercatorToGeographic(new Point( newExtent.xmin, newExtent.ymin) )
                         var max = webMercatorUtils.webMercatorToGeographic(new Point( newExtent.xmax, newExtent.ymax) )
-                        
+
                         this.boundingBox = min.x.toFixed(3) +", "+ min.y.toFixed(3) +", "+ max.x.toFixed(3) +", "+ max.y.toFixed(3);
-                        
+
                         if ( this.zoom != this.map.getZoom() ) {
                             this.zoom = this.map.getZoom();
                         }
