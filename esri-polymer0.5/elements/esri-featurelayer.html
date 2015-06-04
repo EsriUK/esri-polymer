@@ -1,0 +1,36 @@
+    <link rel="import" href="../bower_components/polymer/polymer.html">
+   
+    
+    <polymer-element name="esri-featurelayer" attributes="featureLayer flid">
+        
+        <template>
+            <div></div>
+        </template>
+        
+        <script>     
+                
+            var featureLayerCount = 0;
+            
+            Polymer("esri-featurelayer", {
+
+                // Set some attribute defaults if none set
+                featureLayer : undefined,
+                
+                domReady: function() {
+                    console.log("FEATURE LAYER");
+                    var featureLayer = this.featureLayer
+                    var parent = this.parentNode
+                    this.flid = featureLayerCount;
+                    //console.log(parent.tagName);
+                    if (parent.tagName == "ESRI-MAP") { 
+                        console.log("feature layer is in esri map component, pushing layer", featureLayer, "to ", parent.featureLayerList);
+                        
+                        parent.featureLayerList.push(featureLayer);
+                    }
+                }
+            });  // End of Polymer
+           
+       
+        </script>
+      
+    </polymer-element>

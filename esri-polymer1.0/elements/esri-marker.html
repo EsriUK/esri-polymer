@@ -1,0 +1,70 @@
+
+    <dom-element id="esri-marker">
+
+        <template>
+            <div></div>
+        </template>
+
+        <script>
+
+            Polymer({
+
+                is : "esri-marker",
+
+                properties : {
+                    markerlat : {
+                        type : Number,
+                        value : 0,
+                        reflectToAttribute: true
+                    },
+                    markerlng : {
+                        type : Number,
+                        value : 0,
+                        reflectToAttribute: true
+                    }
+                },
+                
+            
+                ready : function() {
+
+                    console.log("Adding a marker to the map", Polymer.dom(this));
+                    var markerlat = this.markerlat;
+                    var markerlng = this.markerlng;
+                    var parent = Polymer.dom(this).parentNode;
+                    var marker = ["", "", ""];
+                    //console.log(parent.tagName);
+                    if (parent.tagName == "ESRI-MAP" ) {
+                       // console.log(markerlng, markerlat, typeof(markerlat));
+                        if (typeof(markerlng) == "number" && typeof(markerlat) == "number") {
+
+                            marker[0] = [markerlng, markerlat]
+
+                            var children = Polymer.dom(this).children;
+
+                            for (var i = 0; i < children.length; i++) {
+
+                                tag = children[i].tagName;
+                                textContent = children[i].textContent;
+
+                                if (tag == "ESRI-MARKER-TITLE") {
+                                    marker[1] = textContent; // Title
+                                }
+                                if (tag == "ESRI-MARKER-CONTENT") {
+                                    marker[2] = textContent; // Content
+                                }
+                            }
+                            window.addEventListener('WebComponentsReady', function(e) {
+                                //console.log("pushing markers:", marker, parent.markerlist);
+                                parent.markerlist.push(marker);
+                                parent.markerlistChange();
+                            });
+                        }
+                    }
+
+                }
+            });  // End of Polymer
+
+
+        </script>
+
+    </dom-element>

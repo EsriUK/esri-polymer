@@ -1,0 +1,390 @@
+
+    <dom-element id="esri-map">
+        <link href='http://fonts.googleapis.com/css?family=Nunito' rel='stylesheet' type='text/css'>
+        <style>
+
+            .esri-map-element {
+                font-family: 'Nunito', sans-serif;
+                height: 100%;
+                width: 100%;
+                border: 0px;
+                padding: 0px;
+                margin: 0px;
+                overflow: visible;
+            }
+
+            .esri-map-holder {
+                width: 100% !important;
+                height: 100% !important;
+                position: relative;
+
+            }
+
+            .map-contents {
+                position: relative;
+                width: 100% !important;
+                height: 100% !important;
+
+            }
+
+            .esri-zoombox {
+
+                font-family: 'Nunito', sans-serif;
+                height: 29px !important;
+                width: 29px !important;
+                border-radius: 4px;
+                position: absolute;
+                top: 85px;
+                left: 21px;
+                text-align: center;
+                border: rgba(13, 13, 13, 0.84);
+                border-width: 1px;
+                border-style: solid;
+                background-color: white;
+                opacity: 0.9;
+                font-weight: bold;
+                z-index: 1000;
+
+            }
+
+            .bounding-box {
+                font-family: 'Nunito', sans-serif;
+                position: absolute;
+                height: 20px !important;
+                width: 150px !important;
+                bottom: 5px;
+                left: 5px;
+                font-weight: bold;
+                border-radius: 3px;
+                background-color: rgba(189, 189, 190, 0.67);
+                z-index: 1000;
+            }
+
+            input {
+                border-radius: 2px;
+                opacity: 0.65;
+                color: #000001;
+                border:none;
+            }
+            
+            input:focus {
+                outline:none;
+            }
+
+            .esriPopupWrapper {
+                font-family: 'Nunito', sans-serif !important;
+            }
+            
+        </style>
+        <template>
+            
+            <content></content>
+                <div class="esri-map-holder">
+                    <div class="esri-map-element">
+                        <div id={{mapId}} class="map-contents">
+                            <input title="Bounding Box" class="bounding-box" type="text" name="boundingbox" value="{{boundingBox::change}}">
+                            <input title="Zoom Level" class="esri-zoombox" type="text" name="zoom" value="{{zoom::change}}">
+                        </div>
+                    </div>
+                </div>
+            
+
+        </template>
+
+        <script>
+            require([
+            "dojo/domReady!",
+            "esri/map",
+            "esri/InfoTemplate",
+            "esri/symbols/PictureMarkerSymbol",
+            "esri/graphic",
+            "esri/layers/FeatureLayer",
+            "esri/arcgis/utils",
+            "esri/geometry/Extent",
+            "esri/SpatialReference",
+            "esri/geometry/webMercatorUtils",
+            "esri/geometry/Point",
+            ],
+            function(ready, Map, InfoTemplate, PictureMarkerSymbol, Graphic, FeatureLayer, arcgisUtils, Extent, SpatialReference, webMercatorUtils, Point) {
+
+            console.log("init polymer");
+            var mapIdCount = 0; //Static instance counter for creating new selector Ids
+
+            Polymer({
+
+                is: "esri-map",
+
+                properties : {
+                    
+                    mapId : {
+                        type: String,
+                        value : "map",
+                        reflectToAttribute : false
+                    },
+                    map : {
+                        type : Object,
+                        value : undefined,
+                        reflectToAttribute: false
+                    },
+                    webmapid : {
+                        type : String,
+                        value : undefined,
+                        reflectToAttribute : true
+                    },
+                    basemap : {
+                        type : String,
+                        value : "topo",
+                        reflectToAttribute: true
+                    },
+                    lng : {
+                        type : Number,
+                        value : 0,
+                        reflectToAttribute: true
+                    },
+                    lat : {
+                        type : Number,
+                        value : 0,
+                        reflectToAttribute: true
+                    },
+                    extent : {
+                        type: Object,
+                        observer: 'extentChange',
+                        reflectToAttribute : false
+                    },
+                    zoom : {
+                        type : Number,
+                        value : 4,
+                        observer: 'zoomChange',
+                        reflectToAttribute: true
+                    },
+                    boundingBox : {
+                        type: String,
+                        value: ' 0, 0, 0, 0',
+                        observer: 'boundingBoxChange',
+                        reflectToAttribute: false
+                    },
+                    featurelayerlist : {
+                        type: Array,
+                        value : [],
+                        observer: 'featurelayerlistChange',
+                        reflectToAttribute: false,
+                        //notify : true
+                    },
+                    markerlist : {
+                        type: Array,
+                        value : [],
+                        observer: 'markerlistChange',
+                        reflectToAttribute: false,
+                        //notify : true
+                    }
+                    
+                },
+
+                attached : function() {
+
+                    mapIdCount += 1; // Static web component counter
+                    this.mapId = "map" + mapIdCount; //Create a unique selector ID
+
+
+                    // Establish variables
+                    var context = this;
+                    var featurelayerlist = this.featurelayerlist;
+                    var markerlist = this.markerlist;
+                    var zoom = this.zoom;
+                    var minZoom = this.minZoom;
+                    var maxZoom = this.maxZoom;
+                    var basemap = this.basemap;
+                    var centerLng = this.lng;
+                    var centerLat = this.lat;
+                    var selectorId = this.mapId
+                    var webmapid = this.webmapid;
+                    var wkid = new SpatialReference({ wkid : 4326 }); //WGS84
+
+                    // A necessary listener - see: https://github.com/webcomponents/webcomponentsjs#webcomponentsready
+                    // Slso: https://github.com/Polymer/polymer/issues/1381
+                    window.addEventListener('WebComponentsReady', function(e) {
+                                           
+                    // Defining by Web Map ID - Check the web map Id is not undefined or blank
+                    if (selectorId && webmapid) {
+
+                    
+                        // Create map from web map ID
+                        arcgisUtils.createMap(webmapid, selectorId, { minZoom: 2, maxZoom: 16 } ).then( function(returnedMap) {
+                            // console.log("Initialising map");
+                            var fl;
+                            context.map = returnedMap.map;
+
+                            var layerIds = context.map.graphicsLayerIds
+                            for (var i = 0; i < layerIds.length; i++) {
+                                fl = context.map.getLayer(layerIds);
+                                context.defaultPopupFeatureLayer(fl);
+                            }
+                            
+                            returnedMap.map.setExtent(returnedMap.map.extent)
+                            returnedMap.map.on( "extent-change", function(extentObject) {
+                                context.extent = extentObject.extent;
+                            });
+                            
+
+                        });
+                    }
+
+                    // Defining by HTML attributes
+                    else if (selectorId && !webmapid) {
+                      
+                        //console.log("Initialising map without webmapid", context.mapId );
+                        context.map = new Map(selectorId, {
+                            basemap: basemap,
+                            center: [centerLng, centerLat], // longitude, latitude
+                            zoom: zoom,
+                            minZoom: 2,
+                            maxZoom: 16,
+                            SpatialReference: wkid
+                        });
+
+                        context.map.on( "extent-change", function(extentObject) {
+                            context.extent = extentObject.extent;
+                        });
+                        
+                    }
+
+                    }); // end of WebComponentsReady
+                        
+                    
+                }, // end of ready
+
+                zoomChange: function(newZoom, oldZoom) {
+
+                    
+                    if (newZoom && this.map && parseInt(newZoom) != parseInt(oldZoom) ) {
+                        
+                        //console.log("MAX ZOOM", maxZoom, minZoom);
+                        // If inputting from text box
+                        if (typeof(newZoom) == "string") {
+                            newZoom = this.cleanZoomInput(newZoom);
+                            var newZoom = parseInt(newZoom);
+                            this.map.setZoom(newZoom);
+                        }
+                    }
+
+                },
+
+                extentChange: function(newExtent, oldExtent) {
+                    
+                    if (newExtent && this.map) {
+                    
+                        var min = webMercatorUtils.webMercatorToGeographic(new Point( newExtent.xmin, newExtent.ymin) )
+                        var max = webMercatorUtils.webMercatorToGeographic(new Point( newExtent.xmax, newExtent.ymax) )
+                        
+                        this.boundingBox = min.x.toFixed(3) +", "+ min.y.toFixed(3) +", "+ max.x.toFixed(3) +", "+ max.y.toFixed(3);
+                        
+                        if ( this.zoom != this.map.getZoom() ) {
+                            this.zoom = this.map.getZoom();
+                        }
+                        //console.log("New Bounding Box: ", this.boundingBox);
+                    }
+
+                },
+
+                boundingBoxChange: function(newBoundingBox, oldBoundingBox) {
+
+                    if (newBoundingBox && this.map) {
+                        //console.log(newBoundingBox);
+                        var bb = newBoundingBox.split(", ");
+                        if (isNaN(bb[0]) == false && isNaN(bb[1]) == false && isNaN(bb[2]) == false && isNaN(bb[3]) == false) {
+                            var newExtent = new Extent( bb[0], bb[1], bb[2], bb[3], this.wkid  );
+                            this.map.setExtent(newExtent);
+                            //console.log("New Extent", newExtent);
+                        }
+                    }
+
+                },
+
+                featurelayerlistChange: function() {
+
+                    var featurelayerlist = this.featurelayerlist;
+                    var map = this.map;
+
+                    if (map && featurelayerlist.length > 0) {
+
+                        var featureService = featurelayerlist.pop();
+                        var fl = new FeatureLayer(
+                                          featureService,
+                                          {
+                                            mode: FeatureLayer.MODE_SNAPSHOT,
+                                            outFields: ["*"]
+                                          }
+                                          );
+                        console.log(fl);
+                        map.on("load", function() {
+                            //console.log("adding!" ,fl);
+                            map.addLayer(fl)
+                        });
+                        this.defaultPopupFeatureLayer(fl);
+
+                    }
+                },
+
+                markerlistChange: function() {
+
+                    if (this.map && this.markerlist && this.markerlist.length === 1 ) {
+                        var map = this.map;
+                        var wkid = this.wkid;
+                        var markerImg = './imgs/esriGreenPin.png';
+                        var marker = this.markerlist.pop();
+
+                        map.on("load", function() {
+                            // console.log("map is loaded for maker adding");
+                            var lng = marker[0][0];
+                            var lat = marker[0][1];
+                            var title = marker[1];
+                            var content = marker[2];
+                            var symbol = new PictureMarkerSymbol(markerImg, 16, 26);
+                            var geometry = new Point(lng, lat, wkid);
+                            var infoTemplate = new InfoTemplate(title, content);
+
+                            var graphic = new Graphic(geometry, symbol);
+                            graphic.setInfoTemplate(infoTemplate);
+
+                            //console.log("Marker graphic: ", graphic);
+                            map.graphics.add(graphic);
+                        });
+                    }
+
+                },
+
+                defaultPopupFeatureLayer : function(featureLayer) {
+
+                    featureLayer.on( "click", function (evt) {
+                        var graphic = evt.graphic;
+                        var attributes = evt.graphic.attributes;
+                        var template = new InfoTemplate();
+                        var templateContent = "";
+
+                        for(var prop in attributes) {
+                            if(attributes.hasOwnProperty(prop)) {
+                                templateContent = templateContent + "<b>" + prop + "</b>" + " : " + String(attributes[prop]) + "<br>";
+                            }
+                        }
+                        template.setTitle("Feature");
+                        template.setContent(templateContent);
+                        graphic.setInfoTemplate(template);
+                    });
+                },
+
+                cleanZoomInput : function(input) {
+                    var output = input
+                    if (typeof(input) == "string") {
+                        output = output.replace(/\D+/g, '');
+                    }
+                    if (output.length > 2) {
+                        output = output.substring(0,2);
+                    }
+                    return output;
+                }
+            });  // End of Polymer
+            });  // End of ArcGIS / require
+
+        </script>
+
+    </dom-element>

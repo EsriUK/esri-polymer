@@ -1,0 +1,224 @@
+
+    <link rel="import" href="../bower_components/polymer/polymer.html">
+    <link rel="import" href="../bower_components/core-icons/core-icons.html">
+    <link href='http://fonts.googleapis.com/css?family=Nunito' rel='stylesheet' type='text/css'>
+    
+    <polymer-element name="esri-map" attributes="webMapId basemap centerLng centerLat zoom featureLayerList markerLis">
+        
+        <template>
+            <link rel="stylesheet" type="text/css" href="/css/esri-map.css">
+            <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.10/js/esri/css/esri.css">
+            
+            <div id={{mapId}} class="esri-map">
+                <div class="esri-boundingbox">
+                    <core-icon icon="check-box-outline-blank"></core-icon>
+                        <form class="p-bounding-box" onSubmit="return false;"><input title="Bounding Box" type="text" name="boundingbox" value="{{boundingBox}}"></form>
+                </div>
+                <div>
+                    <form style="margin: 0px;" onSubmit="return false;"><input title="Zoom Level" class="esri-zoombox" type="text" name="zoom" value="{{zoom}}"></form>
+                </div>
+            </div>
+        </template>
+        
+        <script>
+            require([  
+            "esri/map",
+            "esri/InfoTemplate",
+            "esri/symbols/PictureMarkerSymbol",
+            "esri/graphic",
+            "esri/layers/FeatureLayer",
+            "esri/arcgis/utils",
+            "esri/geometry/Extent",
+            "esri/SpatialReference",           
+            "esri/geometry/webMercatorUtils",
+            "esri/geometry/Point",
+            "dojo/domReady!"     
+            ],  
+            function(Map, InfoTemplate, PictureMarkerSymbol, Graphic, FeatureLayer, arcgisUtils, Extent, SpatialReference, webMercatorUtils, Point) {    
+                
+            var mapIdCount = 0; //Static instance counter for creating new selector Ids   
+            Polymer("esri-map", {
+
+                // Set some attribute defaults if none set
+                mapId : "map",
+                map : undefined,
+                basemap : "topo",
+                extent : undefined,
+                centerLng : 0, 
+                centerLat : 0,
+                zoom: 7, // Reasonable zoom level
+                boundingBox: " 0, 0, 0, 0",
+                featureLayerList: [],
+                markerList: [],
+                
+                observe: {
+                    extent : 'extentChange',
+                    boundingBox : 'boundingBoxChange',
+                    zoom : 'zoomChange',
+                    featureLayerList : 'featureLayerListChange',
+                    markerList : 'markerListChange'
+                },
+                ready: function() {
+                    
+                    mapIdCount += 1; // Static web component counter
+                    this.mapId = "map" + mapIdCount; //Create a unique selector ID
+                    
+                    // Establish variables
+                    var context = this
+                    var featureLayerList = this.featureLayerList;
+                    var markerList = this.markerList;
+                    var zoom = this.zoom;
+                    var basemap = this.basemap; 
+                    var centerLng = this.centerLng;
+                    var centerLat = this.centerLat;
+                    var selectorId = this.$.map; // this.$ allows us to access shadow DOM ids
+                    var webMapId = this.webMapId;
+                    var wkid = new SpatialReference({ wkid : 4326 }); //WGS84
+                    
+                    // Defining by Web Map ID - Check the web map Id is not undefined or blank
+                    if (webMapId !== null && webMapId !== undefined && webMapId !== "" && webMapId !== " ") {
+                        
+                        // Create map from web map ID
+                       arcgisUtils.createMap(webMapId, selectorId, {
+                          mapOptions: {
+                            slider: true,
+                            nav:false
+                          }
+                        }).then( function(returnedMap) {
+                            var fl;
+                            context.map = returnedMap.map;
+                            context.extent = context.map.extent;
+                            context.map.on( "extent-change", function(extentObject) {
+                                context.extent = extentObject.extent; // When extent changes when extent changes pass it to polymer for to way data binding
+                            });
+                           
+                            var layerIds = context.map.graphicsLayerIds
+                            for (var i = 0; i < layerIds.length; i++) {
+                                fl = context.map.getLayer(layerIds);
+                                
+                                context.defaultPopupFeatureLayer(fl);
+                            }
+                           
+                            console.log(context.map.getLayer(layerIds[0]));
+                            
+                        });
+                    }
+                    
+                    // Defining by HTML attributes
+                    else {
+                        this.map = new Map(selectorId, {
+                           basemap: basemap,  
+                           center: [centerLng, centerLat], // longitude, latitude  
+                           zoom: zoom,
+                           SpatialReference: wkid
+                         });
+                        
+                        this.map.on( "load", function(loadedMap) {
+                            context.extent = loadedMap.map.extent;
+                            loadedMap.map.on( "extent-change", function(extentObject) {
+                                context.extent = extentObject.extent;
+                            });
+                        });  
+                        
+                        
+                    }
+                    
+                },
+                   
+                zoomChange: function(oldZoom, newZoom) {
+                    
+                    if (isNaN(newZoom)) { newZoom = oldZoom }
+                    if (newZoom > this.map.getMaxZoom()) { newZoom = this.map.getMaxZoom() } // Prevent numbers larger than max
+                    if (newZoom < this.map.getMinZoom()) { newZoom = this.map.getMinZoom() } // Prevent numbers smaller than min
+                    
+                    this.map.setZoom(newZoom); 
+                },
+                
+                extentChange: function(oldExtent, newExtent) {
+                    
+                    if (newExtent) {  
+                        var min = webMercatorUtils.webMercatorToGeographic(new Point( newExtent.xmin, newExtent.ymin) )
+                        var max = webMercatorUtils.webMercatorToGeographic(new Point( newExtent.xmax, newExtent.ymax) )
+                       
+                        this.boundingBox = min.x.toFixed(3) +", "+ min.y.toFixed(3) +", "+ max.x.toFixed(3) +", "+ max.y.toFixed(3);
+                        this.zoom = this.map.getZoom();
+                        //console.log("New: ", this.boundingBox);
+                    }
+                },
+                
+                boundingBoxChange: function(oldBoundingBox, newBoundingBox) {
+                    var bb = newBoundingBox.split(", ");
+                    if (isNaN(bb[0]) == false && isNaN(bb[1]) == false && isNaN(bb[2]) == false && isNaN(bb[3]) == false) {
+                        var newExtent = new Extent( bb[0], bb[1], bb[2], bb[3], this.wkid  );
+                        this.map.setExtent(newExtent);
+                    }
+                },
+                
+                featureLayerListChange: function() {
+                    var featureLayerList = this.featureLayerList;  
+                    if (featureLayerList.length > 0) {
+                        var featureService = featureLayerList.pop();
+                        var fl = new FeatureLayer(featureService);
+                        this.map.addLayer(fl);
+                        console.log(this);
+                        this.defaultPopupFeatureLayer(fl);
+                        
+                        console.log("added feature layer to ", this.map);
+                    }
+                },
+                
+                markerListChange: function() {
+                    console.log("markerList changed", this.markerList);
+                    var map = this.map
+                    var wkid = this.wkid
+                    if (this.markerList.length === 1) {
+                        var marker = this.markerList.pop();
+                        console.log("markerList length is 1, ", marker);
+                        if (map) {
+                            map.on("load", function() {
+                                console.log("map is loaded for maker adding");
+                                var lng = marker[0][0];
+                                var lat = marker[0][1];
+                                var title = marker[1];
+                                var content = marker[2];
+                                var symbol = new PictureMarkerSymbol('http://js.arcgis.com/3.12/esri/dijit/images/esriGreenPin16x26.png', 16, 26);
+                                var geometry = new Point(lng, lat, wkid);
+                                var infoTemplate = new InfoTemplate(title, content);
+                                
+                                var graphic = new Graphic(geometry, symbol);
+                                graphic.setInfoTemplate(infoTemplate); 
+    
+                                console.log(graphic);
+                                map.graphics.add(graphic); 
+                            });
+                        }
+                    }
+                },
+                
+                defaultPopupFeatureLayer : function(featureLayer) {
+                    //console.log("Default popup feature layer");
+                    featureLayer.on( "click", function (evt) {  
+
+                        var graphic = evt.graphic;  
+                        var attributes = evt.graphic.attributes;
+                        var template = new InfoTemplate();  
+                        var templateContent = "";
+
+                        for(var prop in attributes) {
+                            if(attributes.hasOwnProperty(prop)) {
+                                templateContent = templateContent + "<b>" + prop + "</b>" + " : " + String(attributes[prop]) + "<br>";
+                            }
+                        }
+
+                        template.setTitle("Feature");
+                        template.setContent(templateContent);
+
+                        graphic.setInfoTemplate(template);  
+                    }); 
+                }
+            });  // End of Polymer
+            });  // End of ArcGIS / require
+       
+        </script>
+      
+    </polymer-element>
