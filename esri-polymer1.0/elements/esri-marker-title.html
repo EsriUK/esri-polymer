@@ -11,11 +11,38 @@
 
                 is : "esri-marker-title",
 
+                properties : {
+                    type : String,
+                    value : "",
+                    notify : true,
+                    observer : 'titleChange'
+                },
+
                 attached : function() {
+
                     console.log("MARKER TITLE", Polymer.dom(this) );
 
-                }
+                    target = Polymer.dom(this).node
 
+                    function updateMarkerTitle(mutations) {
+                        console.log(mutations);
+                    }
+                    new MutationObserver(updateMarkerTitle).observe(
+                        target,
+                        { childList: true, subtree: true }
+                    );
+
+
+
+
+                },
+
+                detatch :  function() {
+                    if (titleObserver) {
+                        titleObserver.disconnect();
+                    }
+
+                }
 
             });  // End of Polymer
 

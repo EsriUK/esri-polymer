@@ -16,6 +16,16 @@
                 attached : function() {
                     console.log("MARKER CONTENT");
 
+                    target = Polymer.dom(this).node
+
+                    function updateMarkerContent(mutations) {
+                        console.log(mutations);
+                    }
+                    new MutationObserver(updateMarkerTitle).observe(
+                        target,
+                        { childList: true, subtree: true }
+                    );
+
                 }
             });  // End of Polymer
 

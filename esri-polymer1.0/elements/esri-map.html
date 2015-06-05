@@ -266,7 +266,7 @@
                 }, // end of ready
 
                 basemapChange: function(newBasemap, oldBasemap) {
-                    console.log("basemap changed", newBasemap)
+                    //console.log("basemap changed", newBasemap)
                     var validBasemaps = [ "dark-gray", "gray", "hybrid", "oceans", "osm",
                                           "satellite", "streets", "terrain", "topo", "national-geographic"];
                     var validBasemap = validBasemaps.indexOf(newBasemap) > -1;
@@ -280,7 +280,7 @@
 
                 zoomChange: function(newZoom, oldZoom) {
 
-                    console.log("zoom changed", newZoom)
+                    //console.log("zoom changed", newZoom)
                     console.log(newZoom, this.map, parseInt(newZoom) != parseInt(oldZoom))
                     if (newZoom && this.map && parseInt(newZoom) != parseInt(oldZoom) ) {
 
@@ -301,7 +301,7 @@
 
                     //console.log("zoom changed", newZoom)
                     //console.log(newZoom, this.map, parseInt(newZoom) != parseInt(oldZoom))
-                    console.log(newLat , this.map , newLat != oldLat );
+                    //console.log(newLat , this.map , newLat != oldLat );
 
                     if (newLat && this.map && newLat != oldLat ) {
                         var coordsDiff = newLat.toFixed(7) != oldLat.toFixed(7);
@@ -310,12 +310,11 @@
                             newLat = parseFloat(newLat);
                             console.log(newLat);
                             if (newLat > -90 && newLat < 90) {
-                                console.log("string and changing lat to: ", newLat)
+
                                 this.map.centerAt(newLat);
                             }
                         }
                         else if ( typeof(newLat) == "number" && coordsDiff && newLat > -90 && newLat < 90) {
-                            console.log("it's a number, and its", newLat);
                             this.map.centerAndZoom(new Point(this.lng, newLat));
                         }
                     }
@@ -326,7 +325,7 @@
 
                     //console.log("zoom changed", newZoom)
                     //console.log(newZoom, this.map, parseInt(newZoom) != parseInt(oldZoom))
-                    console.log(newLng , this.map , newLng != oldLng );
+                    //console.log(newLng , this.map , newLng != oldLng );
 
                     if (newLng && this.map && newLng != oldLng ) {
                         var coordsDiff = newLng.toFixed(7) != oldLng.toFixed(7);
@@ -399,7 +398,7 @@
                                             outFields: ["*"]
                                           }
                                           );
-                        console.log(fl);
+                        //console.log(fl);
                         map.on("load", function() {
                             //console.log("adding!" ,fl);
                             map.addLayer(fl)
@@ -432,6 +431,7 @@
 
                             //console.log("Marker graphic: ", graphic);
                             map.graphics.add(graphic);
+
                         });
                     }
 
