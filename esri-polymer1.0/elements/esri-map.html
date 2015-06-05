@@ -75,6 +75,13 @@
                 font-family: 'Nunito', sans-serif !important;
             }
 
+            esri-marker-title, esri-marker-content {
+                display: none !important;
+                padding: 0px !important;
+                margin: 0px !important;
+                border: none;
+            }
+
         </style>
         <template>
 
@@ -134,17 +141,20 @@
                     basemap : {
                         type : String,
                         value : "topo",
-                        reflectToAttribute: true
+                        reflectToAttribute: true,
+                        observer: 'basemapChange'
                     },
                     lng : {
                         type : Number,
                         value : 0,
-                        reflectToAttribute: true
+                        reflectToAttribute: true,
+                        observer : 'lngChange'
                     },
                     lat : {
                         type : Number,
                         value : 0,
-                        reflectToAttribute: true
+                        reflectToAttribute: true,
+                        observer : 'latChange'
                     },
                     extent : {
                         type: Object,
@@ -184,6 +194,8 @@
 
                     mapIdCount += 1; // Static web component counter
                     this.mapId = "map" + mapIdCount; //Create a unique selector ID
+
+                    this.PictureMarkerSymbol = PictureMarkerSymbol
 
 
                     // Establish variables
@@ -253,17 +265,84 @@
 
                 }, // end of ready
 
+                basemapChange: function(newBasemap, oldBasemap) {
+                    console.log("basemap changed", newBasemap)
+                    var validBasemaps = [ "dark-gray", "gray", "hybrid", "oceans", "osm",
+                                          "satellite", "streets", "terrain", "topo", "national-geographic"];
+                    var validBasemap = validBasemaps.indexOf(newBasemap) > -1;
+                    var validString = parseInt(newBasemap) != parseInt(oldBasemap) && typeof(newBasemap) == "string";
+                    console.log(newBasemap, this.map, validString, validBasemap)
+                    if (newBasemap && this.map && validString && validBasemap) {
+                        this.map.setBasemap(newBasemap);
+                    }
+
+                },
+
                 zoomChange: function(newZoom, oldZoom) {
 
-
+                    console.log("zoom changed", newZoom)
+                    console.log(newZoom, this.map, parseInt(newZoom) != parseInt(oldZoom))
                     if (newZoom && this.map && parseInt(newZoom) != parseInt(oldZoom) ) {
 
-                        //console.log("MAX ZOOM", maxZoom, minZoom);
-                        // If inputting from text box
                         if (typeof(newZoom) == "string") {
                             newZoom = this.cleanZoomInput(newZoom);
                             var newZoom = parseInt(newZoom);
+                            console.log("changing zoom level to: ", newZoom)
                             this.map.setZoom(newZoom);
+                        }
+                        else if (typeof(newZoom) == "number") {
+                            this.map.setZoom(newZoom);
+                        }
+                    }
+
+                },
+
+                latChange: function(newLat, oldLat) {
+
+                    //console.log("zoom changed", newZoom)
+                    //console.log(newZoom, this.map, parseInt(newZoom) != parseInt(oldZoom))
+                    console.log(newLat , this.map , newLat != oldLat );
+
+                    if (newLat && this.map && newLat != oldLat ) {
+                        var coordsDiff = newLat.toFixed(7) != oldLat.toFixed(7);
+                        if (typeof(newLat) == "string") {
+                            newLat = this.cleanZoomInput(newLat);
+                            newLat = parseFloat(newLat);
+                            console.log(newLat);
+                            if (newLat > -90 && newLat < 90) {
+                                console.log("string and changing lat to: ", newLat)
+                                this.map.centerAt(newLat);
+                            }
+                        }
+                        else if ( typeof(newLat) == "number" && coordsDiff && newLat > -90 && newLat < 90) {
+                            console.log("it's a number, and its", newLat);
+                            this.map.centerAndZoom(new Point(this.lng, newLat));
+                        }
+                    }
+
+                },
+
+                lngChange: function(newLng, oldLng) {
+
+                    //console.log("zoom changed", newZoom)
+                    //console.log(newZoom, this.map, parseInt(newZoom) != parseInt(oldZoom))
+                    console.log(newLng , this.map , newLng != oldLng );
+
+                    if (newLng && this.map && newLng != oldLng ) {
+                        var coordsDiff = newLng.toFixed(7) != oldLng.toFixed(7);
+                        if (typeof(newLng) == "string") {
+                            newLng = this.cleanZoomInput(newLng);
+                            newLng = parseFloat(newLng);
+                            //console.log(newLng);
+                            if (newLng > -90 && newLng < 90) {
+                                //console.log("string and changing lat to: ", newLng)
+                                this.map.centerAt(newLng);
+                            }
+                        }
+
+                        else if ( typeof(newLng) == "number" && coordsDiff && newLng > -90 && newLng < 90 ) {
+                            //console.log("it's a number, and its", newLng);
+                            this.map.centerAndZoom(new Point(newLng, this.lat));
                         }
                     }
 
@@ -275,6 +354,9 @@
 
                         var min = webMercatorUtils.webMercatorToGeographic(new Point( newExtent.xmin, newExtent.ymin) )
                         var max = webMercatorUtils.webMercatorToGeographic(new Point( newExtent.xmax, newExtent.ymax) )
+                        var center = webMercatorUtils.webMercatorToGeographic(newExtent.getCenter());
+                        this.lng = center.x;
+                        this.lat = center.y;
 
                         this.boundingBox = min.x.toFixed(3) +", "+ min.y.toFixed(3) +", "+ max.x.toFixed(3) +", "+ max.y.toFixed(3);
 
@@ -299,6 +381,8 @@
                     }
 
                 },
+
+
 
                 featurelayerlistChange: function() {
 
