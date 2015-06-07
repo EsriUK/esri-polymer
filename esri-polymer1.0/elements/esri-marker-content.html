@@ -14,19 +14,53 @@
                 is : "esri-marker-content",
 
                 attached : function() {
-                    console.log("MARKER CONTENT");
 
-                    target = Polymer.dom(this).node
+                    console.log("This marker has a marker content");
+                    var parent = Polymer.dom(this).parentNode;
+                    var target = Polymer.dom(this).node;
 
-                    function updateMarkerContent(mutations) {
-                        console.log(mutations);
-                    }
+
+                    // ASYNC REQUIRED! -- https://github.com/Polymer/polymer/issues/1699
+                    this.async(function() {
+                    window.addEventListener('WebComponentsReady', function(e) {
+
+
+                    var map = Polymer.dom(parent).parentNode.map;
+                    var markerid = parent.markerid;
+                    console.log(map, markerid)
+
                     new MutationObserver(updateMarkerContent).observe(
                         target,
                         { childList: true, subtree: true }
                     );
 
-                }
+                    function updateMarkerContent(mutations) {
+
+                        var graphicLayerIds = map.graphicsLayerIds;
+                        var len = graphicLayerIds.length;
+                        for (var i = 0; i < len; i++) {
+                           var markerLayer = map.getLayer(graphicLayerIds[i]);
+                           //clear this Layer
+                           if (markerLayer.hasOwnProperty("markerId") && markerLayer.markerId == markerid) {
+                               var title = mutations[0].nextSibling.textContent
+                               markerLayer.graphics[0].infoTemplate.setContent(title);
+                               // TODO sort hiding/reshowing of infoWindow
+
+                           }
+                       }
+
+                    }
+
+                    });
+                    });
+
+                    },
+
+                    detached :  function() {
+
+
+                    }
+
             });  // End of Polymer
 
 

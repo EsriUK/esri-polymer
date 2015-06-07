@@ -11,26 +11,45 @@
 
                 is : "esri-marker-title",
 
-                properties : {
-                    type : String,
-                    value : "",
-                    notify : true,
-                    observer : 'titleChange'
-                },
-
                 attached : function() {
 
-                    console.log("MARKER TITLE", Polymer.dom(this) );
+                    console.log("This marker has a marker title");
+                    var parent = Polymer.dom(this).parentNode;
+                    var target = Polymer.dom(this).node;
 
-                    target = Polymer.dom(this).node
+                    // ASYNC REQUIRED! -- https://github.com/Polymer/polymer/issues/1699
+                    this.async(function() {
+                    window.addEventListener('WebComponentsReady', function(e) {
 
-                    function updateMarkerTitle(mutations) {
-                        console.log(mutations);
-                    }
+
+                    var map = Polymer.dom(parent).parentNode.map;
+                    var markerid = parent.markerid;
+                    console.log(map, markerid)
+
                     new MutationObserver(updateMarkerTitle).observe(
                         target,
                         { childList: true, subtree: true }
                     );
+
+                    function updateMarkerTitle(mutations) {
+
+                        var graphicLayerIds = map.graphicsLayerIds;
+                        var len = graphicLayerIds.length;
+                        for (var i = 0; i < len; i++) {
+                           var markerLayer = map.getLayer(graphicLayerIds[i]);
+                           //clear this Layer
+                           if (markerLayer.hasOwnProperty("markerId") && markerLayer.markerId == markerid) {
+                               var title = mutations[0].nextSibling.textContent
+                               markerLayer.graphics[0].infoTemplate.setTitle(title);
+                               // TODO sort hiding/reshowing of infoWindow
+
+                           }
+                       }
+
+                    }
+
+                    });
+                    });
 
                 },
 
@@ -40,9 +59,7 @@
                 }
 
             });  // End of Polymer
-
-
-
+            
         </script>
 
     </dom-element>

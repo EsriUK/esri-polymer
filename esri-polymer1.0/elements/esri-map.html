@@ -194,7 +194,7 @@
 
                     mapIdCount += 1; // Static web component counter
                     this.mapId = "map" + mapIdCount; //Create a unique selector ID
-                    
+
                     // Establish variables
                     var context = this;
                     var featurelayerlist = this.featurelayerlist;
@@ -210,7 +210,7 @@
                     var wkid = new SpatialReference({ wkid : 4326 }); //WGS84
 
                     // A necessary listener - see: https://github.com/webcomponents/webcomponentsjs#webcomponentsready
-                    // Slso: https://github.com/Polymer/polymer/issues/1381
+                    // See also: https://github.com/Polymer/polymer/issues/1381
                     this.async(function() {
                     window.addEventListener('WebComponentsReady', function(e) {
 
@@ -269,7 +269,7 @@
                                           "satellite", "streets", "terrain", "topo", "national-geographic"];
                     var validBasemap = validBasemaps.indexOf(newBasemap) > -1;
                     var validString = parseInt(newBasemap) != parseInt(oldBasemap) && typeof(newBasemap) == "string";
-                    console.log(newBasemap, this.map, validString, validBasemap)
+
                     if (newBasemap && this.map && validString && validBasemap) {
                         this.map.setBasemap(newBasemap);
                     }
@@ -279,7 +279,7 @@
                 zoomChange: function(newZoom, oldZoom) {
 
                     //console.log("zoom changed", newZoom)
-                    console.log(newZoom, this.map, parseInt(newZoom) != parseInt(oldZoom))
+                    //console.log(newZoom, this.map, parseInt(newZoom) != parseInt(oldZoom))
                     if (newZoom && this.map && parseInt(newZoom) != parseInt(oldZoom) ) {
 
                         if (typeof(newZoom) == "string") {
@@ -306,7 +306,7 @@
                         if (typeof(newLat) == "string") {
                             newLat = this.cleanZoomInput(newLat);
                             newLat = parseFloat(newLat);
-                            console.log(newLat);
+                            //console.log(newLat);
                             if (newLat > -90 && newLat < 90) {
 
                                 this.map.centerAt(newLat);

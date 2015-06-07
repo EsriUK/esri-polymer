@@ -32,8 +32,6 @@
 
                 attached : function() {
 
-                    //console.log(Polymer.dom(this))
-                    console.log("FEATURE LAYER", Polymer.dom(this));
                     this.async(function() {
                     var fl = this.fl
                     var parent = Polymer.dom(this).parentNode;
@@ -42,11 +40,11 @@
                     this.flid = _featureLayerCount;
                     //console.log(parent.tagName);
                     if (fl && parent && parent.tagName == "ESRI-MAP") {
-                        console.log("feature layer is in esri map component, pushing layer", fl, "to ", parent.featurelayerlist);
+
                         window.addEventListener('WebComponentsReady', function(e) {
                             parent.featurelayerlist.push(fl);
                             parent.featurelayerlistChange();
-                            console.log(parent, parent.featurelayerlist);
+                            console.log("Adding FeatureLayer", fl);
                         });
                     }
 

@@ -32,13 +32,14 @@
 
 
                 attached : function() {
-                    // ASYNC REQUIRED! -- https://github.com/Polymer/polymer/issues/1699
+
                     var markerlat = this.markerlat;
                     var markerlng = this.markerlng;
                     var markerid = _markerId;
                     var parent = Polymer.dom(this).parentNode;
                     var marker = ["", "", ""];
 
+                    // ASYNC REQUIRED! -- https://github.com/Polymer/polymer/issues/1699
                     this.async(function() {
 
                     if (parent.tagName == "ESRI-MAP" ) {
@@ -74,7 +75,7 @@
             },
 
             detached : function() {
-
+                    // When <esri-marker> removed from DOM
                     var map = Polymer.dom(this).parentNode.map;
                     var graphics = map.graphics.graphics
                     var markerid = this.markerid
