@@ -6,6 +6,7 @@
         </template>
 
         <script>
+            _markerId = 0;
 
             Polymer({
 
@@ -21,21 +22,27 @@
                         type : Number,
                         value : 0,
                         reflectToAttribute: true
+                    },
+                    markerid : {
+                        type : Number,
+                        value : 0,
+                        reflectToAttribute: false
                     }
                 },
 
 
                 attached : function() {
                     // ASYNC REQUIRED! -- https://github.com/Polymer/polymer/issues/1699
-                    this.async(function() {
-                    console.log("Adding a marker to the map", Polymer.dom(this));
                     var markerlat = this.markerlat;
                     var markerlng = this.markerlng;
+                    var markerid = _markerId;
                     var parent = Polymer.dom(this).parentNode;
                     var marker = ["", "", ""];
-                    //console.log(parent.tagName);
+
+                    this.async(function() {
+
                     if (parent.tagName == "ESRI-MAP" ) {
-                       // console.log(markerlng, markerlat, typeof(markerlat));
+
                         if (typeof(markerlng) == "number" && typeof(markerlat) == "number") {
 
                             marker[0] = [markerlng, markerlat]
@@ -56,14 +63,32 @@
                             }
                             window.addEventListener('WebComponentsReady', function(e) {
                                 //console.log("pushing markers:", marker, parent.markerlist);
-                                parent.markerlist.push(marker);
-                                parent.markerlistChange();
+                                parent.addmarker.push( [ marker, _markerId ] );
+                                parent.addmarkerChange();
+                                _markerId += 1;
                             });
                         }
                     }
                 })
 
-                }
+            },
+
+            detached : function() {
+
+                    var map = Polymer.dom(this).parentNode.map;
+                    var graphics = map.graphics.graphics
+                    var markerid = this.markerid
+
+                    var graphicLayerIds = map.graphicsLayerIds;
+                    var len = graphicLayerIds.length;
+                    for (var i = 0; i < len; i++) {
+                       var markerLayer = map.getLayer(graphicLayerIds[i]);
+                       //clear this Layer
+                       if (markerLayer.hasOwnProperty("markerId") && markerLayer.markerId == markerid) {
+                           markerLayer.clear();
+                       }
+                   }
+            }
             });  // End of Polymer
 
 

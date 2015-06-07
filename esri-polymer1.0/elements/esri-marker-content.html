@@ -21,7 +21,7 @@
                     function updateMarkerContent(mutations) {
                         console.log(mutations);
                     }
-                    new MutationObserver(updateMarkerTitle).observe(
+                    new MutationObserver(updateMarkerContent).observe(
                         target,
                         { childList: true, subtree: true }
                     );

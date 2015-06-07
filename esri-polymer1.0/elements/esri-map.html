@@ -104,6 +104,7 @@
             "esri/map",
             "esri/InfoTemplate",
             "esri/symbols/PictureMarkerSymbol",
+            "esri/layers/GraphicsLayer",
             "esri/graphic",
             "esri/layers/FeatureLayer",
             "esri/arcgis/utils",
@@ -112,7 +113,7 @@
             "esri/geometry/webMercatorUtils",
             "esri/geometry/Point",
             ],
-            function(ready, Map, InfoTemplate, PictureMarkerSymbol, Graphic, FeatureLayer, arcgisUtils, Extent, SpatialReference, webMercatorUtils, Point) {
+            function(ready, Map, InfoTemplate, PictureMarkerSymbol, GraphicsLayer, Graphic, FeatureLayer, arcgisUtils, Extent, SpatialReference, webMercatorUtils, Point) {
 
             console.log("init polymer");
             var mapIdCount = 0; //Static instance counter for creating new selector Ids
@@ -180,28 +181,24 @@
                         reflectToAttribute: false,
                         //notify : true
                     },
-                    markerlist : {
+                    addmarker : {
                         type: Array,
                         value : [],
-                        observer: 'markerlistChange',
-                        reflectToAttribute: false,
+                        observer: 'addmarkerChange',
+                        reflectToAttribute: false
                         //notify : true
                     }
-
                 },
 
                 attached : function() {
 
                     mapIdCount += 1; // Static web component counter
                     this.mapId = "map" + mapIdCount; //Create a unique selector ID
-
-                    this.PictureMarkerSymbol = PictureMarkerSymbol
-
-
+                    
                     // Establish variables
                     var context = this;
                     var featurelayerlist = this.featurelayerlist;
-                    var markerlist = this.markerlist;
+                    var addmarker = this.addmarker;
                     var zoom = this.zoom;
                     var minZoom = this.minZoom;
                     var maxZoom = this.maxZoom;
@@ -214,52 +211,53 @@
 
                     // A necessary listener - see: https://github.com/webcomponents/webcomponentsjs#webcomponentsready
                     // Slso: https://github.com/Polymer/polymer/issues/1381
+                    this.async(function() {
                     window.addEventListener('WebComponentsReady', function(e) {
 
-                    // Defining by Web Map ID - Check the web map Id is not undefined or blank
-                    if (selectorId && webmapid) {
+                        // Defining by Web Map ID - Check the web map Id is not undefined or blank
+                        if (selectorId && webmapid) {
 
 
-                        // Create map from web map ID
-                        arcgisUtils.createMap(webmapid, selectorId, { minZoom: 2, maxZoom: 16 } ).then( function(returnedMap) {
-                            // console.log("Initialising map");
-                            var fl;
-                            context.map = returnedMap.map;
+                            // Create map from web map ID
+                            arcgisUtils.createMap(webmapid, selectorId, { minZoom: 2, maxZoom: 16 } ).then( function(returnedMap) {
+                                // console.log("Initialising map");
+                                var fl;
+                                context.map = returnedMap.map;
 
-                            var layerIds = context.map.graphicsLayerIds
-                            for (var i = 0; i < layerIds.length; i++) {
-                                fl = context.map.getLayer(layerIds);
-                                context.defaultPopupFeatureLayer(fl);
-                            }
+                                var layerIds = context.map.graphicsLayerIds
+                                for (var i = 0; i < layerIds.length; i++) {
+                                    fl = context.map.getLayer(layerIds);
+                                    context.defaultPopupFeatureLayer(fl);
+                                }
 
-                            returnedMap.map.setExtent(returnedMap.map.extent)
-                            returnedMap.map.on( "extent-change", function(extentObject) {
+                                returnedMap.map.setExtent(returnedMap.map.extent)
+                                returnedMap.map.on( "extent-change", function(extentObject) {
+                                    context.extent = extentObject.extent;
+                                });
+
+
+                            });
+                        }
+
+                        // Defining by HTML attributes
+                        else if (selectorId && !webmapid) {
+
+                            //console.log("Initialising map without webmapid", context.mapId );
+                            context.map = new Map(selectorId, {
+                                basemap: basemap,
+                                center: [centerLng, centerLat], // longitude, latitude
+                                zoom: zoom,
+                                minZoom: 2,
+                                maxZoom: 16,
+                                SpatialReference: wkid
+                            });
+
+                            context.map.on( "extent-change", function(extentObject) {
                                 context.extent = extentObject.extent;
                             });
 
-
-                        });
-                    }
-
-                    // Defining by HTML attributes
-                    else if (selectorId && !webmapid) {
-
-                        //console.log("Initialising map without webmapid", context.mapId );
-                        context.map = new Map(selectorId, {
-                            basemap: basemap,
-                            center: [centerLng, centerLat], // longitude, latitude
-                            zoom: zoom,
-                            minZoom: 2,
-                            maxZoom: 16,
-                            SpatialReference: wkid
-                        });
-
-                        context.map.on( "extent-change", function(extentObject) {
-                            context.extent = extentObject.extent;
-                        });
-
-                    }
-
+                        }
+                    }); //end of async
                     }); // end of WebComponentsReady
 
 
@@ -408,16 +406,19 @@
                     }
                 },
 
-                markerlistChange: function() {
+                addmarkerChange: function() {
 
-                    if (this.map && this.markerlist && this.markerlist.length === 1 ) {
+                    if (this.map && this.addmarker && this.addmarker.length === 1 ) {
+
                         var map = this.map;
                         var wkid = this.wkid;
                         var markerImg = './imgs/esriGreenPin.png';
-                        var marker = this.markerlist.pop();
+                        var markerArray = this.addmarker.pop();
+                        var marker = markerArray[0]
+                        var markerId = markerArray[1];
 
                         map.on("load", function() {
-                            // console.log("map is loaded for maker adding");
+
                             var lng = marker[0][0];
                             var lat = marker[0][1];
                             var title = marker[1];
@@ -425,12 +426,13 @@
                             var symbol = new PictureMarkerSymbol(markerImg, 16, 26);
                             var geometry = new Point(lng, lat, wkid);
                             var infoTemplate = new InfoTemplate(title, content);
-
                             var graphic = new Graphic(geometry, symbol);
-                            graphic.setInfoTemplate(infoTemplate);
+                            var markerLayer = new GraphicsLayer();
+                            markerLayer.markerId = markerId;
 
-                            //console.log("Marker graphic: ", graphic);
-                            map.graphics.add(graphic);
+                            graphic.setInfoTemplate(infoTemplate);
+                            markerLayer.add(graphic);
+                            map.addLayer(markerLayer);
 
                         });
                     }
@@ -466,6 +468,7 @@
                     }
                     return output;
                 }
+
             });  // End of Polymer
             });  // End of ArcGIS / require
 
