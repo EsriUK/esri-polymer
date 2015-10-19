@@ -49,13 +49,9 @@
                     this.async(function() {
 
                     if (parent.tagName == "ESRI-MAP" ) {
-
                         if (typeof(markerlng) == "number" && typeof(markerlat) == "number") {
-
                             marker[0] = [markerlng, markerlat]
-
                             var children = Polymer.dom(this).children;
-
                             for (var i = 0; i < children.length; i++) {
 
                                 tag = children[i].tagName;
@@ -68,7 +64,6 @@
                                     marker[2] = textContent; // Content
                                 }
                             }
-
                             //console.log("pushing markers:", marker, parent.markerlist);
                             parent.addmarker.push( [ marker, _markerId ] );
                             parent.addmarkerChange();

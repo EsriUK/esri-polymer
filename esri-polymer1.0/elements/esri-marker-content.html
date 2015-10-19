@@ -21,13 +21,13 @@
                 attached: function() {
                     this.async(function() {
 
-                    console.log("This marker has a marker content");
+                    //console.log("This marker has a marker content");
                     var parent = Polymer.dom(this).parentNode;
                     var target = Polymer.dom(this).node;
 
                     var map = Polymer.dom(parent).parentNode.map;
                     var markerid = parent.markerid;
-                    console.log(map, markerid)
+                    //console.log(map, markerid)
 
                     new MutationObserver(updateMarkerContent).observe(
                         target,

@@ -40,12 +40,9 @@
                     this.flid = _featureLayerCount;
                     //console.log(parent.tagName);
                     if (fl && parent && parent.tagName == "ESRI-MAP") {
-
-
                         parent.featurelayerlist.push(fl);
                         parent.featurelayerlistChange();
-                        console.log("Adding FeatureLayer", fl);
-
+                        //console.log("Adding FeatureLayer", fl);
                     }
 
                 }) // end of async
