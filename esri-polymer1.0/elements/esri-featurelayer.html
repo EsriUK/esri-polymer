@@ -41,11 +41,11 @@
                     //console.log(parent.tagName);
                     if (fl && parent && parent.tagName == "ESRI-MAP") {
 
-                        window.addEventListener('WebComponentsReady', function(e) {
-                            parent.featurelayerlist.push(fl);
-                            parent.featurelayerlistChange();
-                            console.log("Adding FeatureLayer", fl);
-                        });
+
+                        parent.featurelayerlist.push(fl);
+                        parent.featurelayerlistChange();
+                        console.log("Adding FeatureLayer", fl);
+
                     }
 
                 }) // end of async

@@ -1,7 +1,12 @@
 
-    <dom-element id="esri-marker">
+    <dom-module id="esri-marker">
 
         <template>
+            <style>
+                :host {
+                    display: none;
+                }
+            </style>
             <content></content>
         </template>
 
@@ -31,7 +36,8 @@
                 },
 
 
-                attached : function() {
+                attached: function() {
+                    this.async(function() {
 
                     var markerlat = this.markerlat;
                     var markerlng = this.markerlng;
@@ -62,16 +68,15 @@
                                     marker[2] = textContent; // Content
                                 }
                             }
-                            window.addEventListener('WebComponentsReady', function(e) {
-                                //console.log("pushing markers:", marker, parent.markerlist);
-                                parent.addmarker.push( [ marker, _markerId ] );
-                                parent.addmarkerChange();
-                                _markerId += 1;
-                            });
+
+                            //console.log("pushing markers:", marker, parent.markerlist);
+                            parent.addmarker.push( [ marker, _markerId ] );
+                            parent.addmarkerChange();
+                            _markerId += 1;
                         }
                     }
                 })
-
+                });
             },
 
             detached : function() {
@@ -95,4 +100,4 @@
 
         </script>
 
-    </dom-element>
+    </dom-module>

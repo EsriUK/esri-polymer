@@ -1,8 +1,13 @@
 
 
-    <dom-element id="esri-marker-content">
+    <dom-module id="esri-marker-content">
 
         <template >
+            <style>
+                :host {
+                    display: none;
+                }
+            </style>
             <content></content>
         </template>
 
@@ -13,17 +18,12 @@
 
                 is : "esri-marker-content",
 
-                attached : function() {
+                attached: function() {
+                    this.async(function() {
 
                     console.log("This marker has a marker content");
                     var parent = Polymer.dom(this).parentNode;
                     var target = Polymer.dom(this).node;
-
-
-                    // ASYNC REQUIRED! -- https://github.com/Polymer/polymer/issues/1699
-                    this.async(function() {
-                    window.addEventListener('WebComponentsReady', function(e) {
-
 
                     var map = Polymer.dom(parent).parentNode.map;
                     var markerid = parent.markerid;
@@ -51,19 +51,17 @@
 
                     }
 
-                    });
-                    });
+                    }); //end of async
+                },
 
-                    },
-
-                    detached :  function() {
+                detached :  function() {
 
 
-                    }
+                }
 
             });  // End of Polymer
 
 
         </script>
 
-    </dom-element>
+    </dom-module>

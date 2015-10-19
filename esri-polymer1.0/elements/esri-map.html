@@ -1,90 +1,83 @@
 
-    <dom-element id="esri-map">
+    <dom-module id="esri-map">
         <link href='http://fonts.googleapis.com/css?family=Nunito' rel='stylesheet' type='text/css'>
-        <style>
 
-            .esri-map-element {
-                font-family: 'Nunito', sans-serif;
-                height: 100%;
-                width: 100%;
-                border: 0px;
-                padding: 0px;
-                margin: 0px;
-                overflow: visible;
-            }
-
-            .esri-map-holder {
-                width: 100% !important;
-                height: 100% !important;
-                position: relative;
-
-            }
-
-            .map-contents {
-                position: relative;
-                width: 100% !important;
-                height: 100% !important;
-
-            }
-
-            .esri-zoombox {
-
-                font-family: 'Nunito', sans-serif;
-                height: 29px !important;
-                width: 29px !important;
-                border-radius: 4px;
-                position: absolute;
-                top: 85px;
-                left: 21px;
-                text-align: center;
-                border: rgba(13, 13, 13, 0.84);
-                border-width: 1px;
-                border-style: solid;
-                background-color: white;
-                opacity: 0.9;
-                font-weight: bold;
-                z-index: 1000;
-
-            }
-
-            .bounding-box {
-                font-family: 'Nunito', sans-serif;
-                position: absolute;
-                height: 20px !important;
-                width: 150px !important;
-                bottom: 5px;
-                left: 5px;
-                font-weight: bold;
-                border-radius: 3px;
-                background-color: rgba(189, 189, 190, 0.67);
-                z-index: 1000;
-            }
-
-            input {
-                border-radius: 2px;
-                opacity: 0.65;
-                color: #000001;
-                border:none;
-            }
-
-            input:focus {
-                outline:none;
-            }
-
-            .esriPopupWrapper {
-                font-family: 'Nunito', sans-serif !important;
-            }
-
-            esri-marker-title, esri-marker-content {
-                display: none !important;
-                padding: 0px !important;
-                margin: 0px !important;
-                border: none;
-            }
-
-        </style>
         <template>
+            <style>
 
+                .esri-map-element {
+                    font-family: 'Nunito', sans-serif;
+                    height: 100%;
+                    width: 100%;
+                    border: 0px;
+                    padding: 0px;
+                    margin: 0px;
+                    overflow: visible;
+                }
+
+                .esri-map-holder {
+                    width: 100% !important;
+                    height: 100% !important;
+                    position: relative;
+
+                }
+
+                .map-contents {
+                    position: relative;
+                    width: 100% !important;
+                    height: 100% !important;
+
+                }
+
+                .esri-zoombox {
+
+                    font-family: 'Nunito', sans-serif;
+                    height: 29px !important;
+                    width: 29px !important;
+                    border-radius: 4px;
+                    position: absolute;
+                    top: 85px;
+                    left: 21px;
+                    text-align: center;
+                    border: rgba(13, 13, 13, 0.84);
+                    border-width: 1px;
+                    border-style: solid;
+                    background-color: white;
+                    opacity: 0.9;
+                    font-weight: bold;
+                    z-index: 1000;
+
+                }
+
+                .bounding-box {
+                    font-family: 'Nunito', sans-serif;
+                    position: absolute;
+                    height: 20px !important;
+                    width: 150px !important;
+                    bottom: 5px;
+                    left: 5px;
+                    font-weight: bold;
+                    border-radius: 3px;
+                    background-color: rgba(189, 189, 190, 0.67);
+                    z-index: 1000;
+                }
+
+                input {
+                    border-radius: 2px;
+                    opacity: 0.65;
+                    color: #000001;
+                    border:none;
+                }
+
+                input:focus {
+                    outline:none;
+                }
+
+                .esriPopupWrapper {
+                    font-family: 'Nunito', sans-serif !important;
+                }
+
+            </style>
             <content></content>
             <div class="esri-map-holder">
                 <div class="esri-map-element">
@@ -99,8 +92,8 @@
         </template>
 
         <script>
+
             require([
-            "dojo/domReady!",
             "esri/map",
             "esri/InfoTemplate",
             "esri/symbols/PictureMarkerSymbol",
@@ -113,7 +106,7 @@
             "esri/geometry/webMercatorUtils",
             "esri/geometry/Point",
             ],
-            function(ready, Map, InfoTemplate, PictureMarkerSymbol, GraphicsLayer, Graphic, FeatureLayer, arcgisUtils, Extent, SpatialReference, webMercatorUtils, Point) {
+            function(Map, InfoTemplate, PictureMarkerSymbol, GraphicsLayer, Graphic, FeatureLayer, arcgisUtils, Extent, SpatialReference, webMercatorUtils, Point) {
 
             console.log("init polymer");
             var mapIdCount = 0; //Static instance counter for creating new selector Ids
@@ -190,7 +183,8 @@
                     }
                 },
 
-                attached : function() {
+                attached: function() {
+                    this.async(function() {
 
                     mapIdCount += 1; // Static web component counter
                     this.mapId = "map" + mapIdCount; //Create a unique selector ID
@@ -211,55 +205,53 @@
 
                     // A necessary listener - see: https://github.com/webcomponents/webcomponentsjs#webcomponentsready
                     // See also: https://github.com/Polymer/polymer/issues/1381
-                    this.async(function() {
-                    window.addEventListener('WebComponentsReady', function(e) {
-
-                        // Defining by Web Map ID - Check the web map Id is not undefined or blank
-                        if (selectorId && webmapid) {
 
 
-                            // Create map from web map ID
-                            arcgisUtils.createMap(webmapid, selectorId, { minZoom: 2, maxZoom: 16 } ).then( function(returnedMap) {
-                                // console.log("Initialising map");
-                                var fl;
-                                context.map = returnedMap.map;
-
-                                var layerIds = context.map.graphicsLayerIds
-                                for (var i = 0; i < layerIds.length; i++) {
-                                    fl = context.map.getLayer(layerIds);
-                                    context.defaultPopupFeatureLayer(fl);
-                                }
-
-                                returnedMap.map.setExtent(returnedMap.map.extent)
-                                returnedMap.map.on( "extent-change", function(extentObject) {
-                                    context.extent = extentObject.extent;
-                                });
+                    // Defining by Web Map ID - Check the web map Id is not undefined or blank
+                    if (selectorId && webmapid) {
 
 
-                            });
-                        }
+                        // Create map from web map ID
+                        arcgisUtils.createMap(webmapid, selectorId, { minZoom: 2, maxZoom: 16 } ).then( function(returnedMap) {
+                            // console.log("Initialising map");
+                            var fl;
+                            context.map = returnedMap.map;
 
-                        // Defining by HTML attributes
-                        else if (selectorId && !webmapid) {
+                            var layerIds = context.map.graphicsLayerIds
+                            for (var i = 0; i < layerIds.length; i++) {
+                                fl = context.map.getLayer(layerIds);
+                                context.defaultPopupFeatureLayer(fl);
+                            }
 
-                            //console.log("Initialising map without webmapid", context.mapId );
-                            context.map = new Map(selectorId, {
-                                basemap: basemap,
-                                center: [centerLng, centerLat], // longitude, latitude
-                                zoom: zoom,
-                                minZoom: 2,
-                                maxZoom: 16,
-                                SpatialReference: wkid
-                            });
-
-                            context.map.on( "extent-change", function(extentObject) {
+                            returnedMap.map.setExtent(returnedMap.map.extent)
+                            returnedMap.map.on( "extent-change", function(extentObject) {
                                 context.extent = extentObject.extent;
                             });
 
-                        }
-                    }); //end of async
-                    }); // end of WebComponentsReady
 
+                        });
+                    }
+
+                    // Defining by HTML attributes
+                    else if (selectorId && !webmapid) {
+
+                        console.log("Initialising map without webmapid", context.mapId );
+                        context.map = new Map(context.mapId, {
+                            basemap: basemap,
+                            center: [centerLng, centerLat], // longitude, latitude
+                            zoom: zoom,
+                            minZoom: 2,
+                            maxZoom: 16,
+                            SpatialReference: wkid
+                        });
+
+                        context.map.on( "extent-change", function(extentObject) {
+                            context.extent = extentObject.extent;
+                        });
+
+                    }
+
+                }); // end of async
 
                 }, // end of ready
 
@@ -474,4 +466,4 @@
 
         </script>
 
-    </dom-element>
+    </dom-module>

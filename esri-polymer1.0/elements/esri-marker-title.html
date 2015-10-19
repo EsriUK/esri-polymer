@@ -1,8 +1,14 @@
 
-    <dom-element id="esri-marker-title">
+    <dom-module id="esri-marker-title">
 
         <template>
-            <content></content>
+            <style>
+                :host {
+                    display: none;
+                }
+            </style>
+            <content>
+            </content>
         </template>
 
         <script>
@@ -11,16 +17,12 @@
 
                 is : "esri-marker-title",
 
-                attached : function() {
+                attached: function() {
+                    this.async(function() {
 
                     console.log("This marker has a marker title");
                     var parent = Polymer.dom(this).parentNode;
                     var target = Polymer.dom(this).node;
-
-                    // ASYNC REQUIRED! -- https://github.com/Polymer/polymer/issues/1699
-                    this.async(function() {
-                    window.addEventListener('WebComponentsReady', function(e) {
-
 
                     var map = Polymer.dom(parent).parentNode.map;
                     var markerid = parent.markerid;
@@ -49,8 +51,6 @@
                     }
 
                     });
-                    });
-
                 },
 
                 detached :  function() {
@@ -59,7 +59,7 @@
                 }
 
             });  // End of Polymer
-            
+
         </script>
 
-    </dom-element>
+    </dom-module>
