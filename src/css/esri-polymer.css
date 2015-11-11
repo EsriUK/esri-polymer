@@ -12,8 +12,3 @@ esri-map {
     height: 500px;
     float:left;
 }
-
-#mapholder {
-    width: 100%;
-    height: 100%;
-}

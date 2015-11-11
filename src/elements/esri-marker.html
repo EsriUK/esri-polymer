@@ -37,19 +37,21 @@
 
 
                 attached: function() {
-                    this.async(function() {
+                    var component = this;
+                    window.addEventListener("WebComponentsReady", function(){
+                    component.async(function() {
 
-                    var markerlat = this.markerlat;
-                    var markerlng = this.markerlng;
+                    var markerlat = component.markerlat;
+                    var markerlng = component.markerlng;
                     var markerid = _markerId;
-                    var parent = Polymer.dom(this).parentNode;
+                    var parentComponent = Polymer.dom(component).parentNode;
                     var marker = ["", "", ""];
 
 
-                    if (parent.tagName == "ESRI-MAP" ) {
+                    if (parentComponent.tagName == "ESRI-MAP" ) {
                         if (typeof(markerlng) == "number" && typeof(markerlat) == "number") {
                             marker[0] = [markerlng, markerlat]
-                            var children = Polymer.dom(this).children;
+                            var children = Polymer.dom(component).children;
                             for (var i = 0; i < children.length; i++) {
 
                                 tag = children[i].tagName;
@@ -62,18 +64,19 @@
                                     marker[2] = textContent; // Content
                                 }
                             }
-                            //console.log("pushing markers:", marker, parent.markerlist);
-                            parent.addmarker.push( [ marker, _markerId ] );
-                            parent.addmarkerChange();
+                            //console.log("pushing markers:", marker, parentComponent.markerlist);
+                            parentComponent.addmarker.push( [ marker, _markerId ] );
+                            parentComponent.addmarkerChange();
                             _markerId += 1;
                         }
                     }
+                });
                 });
             },
 
             detached : function() {
                     // When <esri-marker> removed from DOM
-                    var map = Polymer.dom(this).parentNode.map;
+                    var map = Polymer.dom(this).parentComponentNode.map;
                     var graphics = map.graphics.graphics
                     var markerid = this.markerid
 

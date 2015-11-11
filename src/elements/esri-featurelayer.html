@@ -9,8 +9,6 @@
 
         <script>
 
-            var _featureLayerCount = 0;
-
             Polymer({
 
                 is: "esri-featurelayer",
@@ -31,25 +29,27 @@
                 },
 
                 attached : function() {
-                    var fs = this.fs;
-
-                    var parent = Polymer.dom(this).parentNode;
-                    var flid = _featureLayerCount;
-                    _featureLayerCount += 1;
-
-                    this.async(function() {
-
+                    var component = this;
+                    window.addEventListener("WebComponentsReady", function(){
+                    component.async(function() {
                         console.log("Initialising Feature Layerr");
-                        if ( fs && parent && parent.tagName == "ESRI-MAP") {
-                            parent.featurelayerlist.push(fs);
-                            parent.featurelayerlistChange();
-                            console.log("Adding FeatureLayer", fs, fs.renderer, parent.map);
+                        var parentComponent = Polymer.dom(component).parentNode;
+                        var fs = component.fs;
 
+                        if ( fs && parentComponent && parentComponent.tagName == "ESRI-MAP") {
+                            try {
+                                parentComponent.featureLayerQueue.push(fs);
+                                parentComponent.featureLayerQueueChange();
+                            }
+                            catch(err) {
+                                console.log("Loading error", err);
+                            }
                         }
 
-                });// end of async
-                } // End of attached
-            });  // End of Polymer
+                }); // end of async
+                }); // end of WebComponentsReady
+                }   // End of attached
+            });     // End of Polymer
 
 
         </script>

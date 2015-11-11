@@ -16,23 +16,23 @@
                 }
 
                 .esri-map-holder {
-                    width: 100% !important;
-                    height: 100% !important;
+                    width: 100%;
+                    height: 100%;
                     position: relative;
 
                 }
 
                 .map-contents {
                     position: relative;
-                    width: 100% !important;
-                    height: 100% !important;
+                    width: 100%;
+                    height: 100%;
                 }
 
                 .esri-zoombox {
 
                     font-family: 'Nunito', sans-serif;
-                    height: 29px !important;
-                    width: 29px !important;
+                    height: 29px;
+                    width: 29px;
                     border-radius: 4px;
                     position: absolute;
                     top: 85px;
@@ -51,8 +51,8 @@
                 .bounding-box {
                     font-family: 'Nunito', sans-serif;
                     position: absolute;
-                    height: 20px !important;
-                    width: 150px !important;
+                    height: 20px;
+                    width: 150px;
                     bottom: 5px;
                     left: 5px;
                     font-weight: bold;
@@ -104,6 +104,7 @@
             "esri/SpatialReference",
             "esri/geometry/webMercatorUtils",
             "esri/geometry/Point",
+            "dojo/domReady!"
             ],
             function(Map, InfoTemplate, PictureMarkerSymbol, GraphicsLayer, Graphic, FeatureLayer, arcgisUtils, Extent, SpatialReference, webMercatorUtils, Point) {
 
@@ -166,10 +167,10 @@
                         observer: 'boundingBoxChange',
                         reflectToAttribute: false
                     },
-                    featurelayerlist : {
+                    featureLayerQueue : {
                         type: Array,
                         value : [],
-                        observer: 'featurelayerlistChange',
+                        observer: 'featureLayerQueueChange',
                         reflectToAttribute: false,
                         //notify : true
                     },
@@ -183,14 +184,13 @@
                 },
 
                 attached: function() {
-                    this.async(function() {
 
                     mapIdCount += 1; // Static web component counter
                     this.mapId = "map" + mapIdCount; //Create a unique selector ID
 
                     // Establish variables
                     var context = this;
-                    var featurelayerlist = this.featurelayerlist;
+                    var featureLayerQueue = this.featureLayerQueue;
                     var addmarker = this.addmarker;
                     var zoom = this.zoom;
                     var minZoom = this.minZoom;
@@ -202,6 +202,8 @@
                     var webmapid = this.webmapid;
                     var wkid = new SpatialReference({ wkid : 4326 }); //WGS84
 
+                    window.addEventListener("WebComponentsReady", function(){
+                    context.async(function() {
                     // Defining by Web Map ID - Check the web map Id is not undefined or blank
                     if (selectorId && webmapid) {
 
@@ -246,6 +248,8 @@
                     }
 
                 }); // end of async
+                }); // end of WebComponentsReady
+
 
                 }, // end of ready
 
@@ -353,26 +357,17 @@
 
                 },
 
-                featurelayerlistChange: function() {
+                featureLayerQueueChange: function() {
 
-                    var featurelayerlist = this.featurelayerlist;
+                    var featureLayerQueue = this.featureLayerQueue;
                     var map = this.map;
-                    var context = this;
-
-                    if (map && featurelayerlist.length > 0) {
-
-                        var featureService = featurelayerlist.pop();
-                        var fl = new FeatureLayer( featureService, {
-                                                    mode : FeatureLayer.MODE_SNAPSHOT,
-                                                    outFields: ["*"]
-                                                });
-                            map.addLayer(fl);
-                            //fl.setOpacity(1.0);
-                            console.log("Adding FeatureLayer", fl, fl.renderer);
-                            context.defaultPopupFeatureLayer(fl);
-
+                    
+                    if (map && featureLayerQueue.length > 0) {
+                        var featureService = featureLayerQueue.pop();
+                        var fl = new FeatureLayer( featureService, { outFields: ["*"] });
+                        map.addLayer(fl);
+                        this.defaultPopupFeatureLayer(fl);
                     }
-
                 },
 
                 addmarkerChange: function() {
