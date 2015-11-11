@@ -16,7 +16,7 @@
                 is: "esri-featurelayer",
 
                 properties : {
-                    fl : {
+                    fs : {
                         type: String,
                         value: undefined, // Set some attribute defaults if none
                         reflectToAttribute : true,
@@ -31,23 +31,24 @@
                 },
 
                 attached : function() {
+                    var fs = this.fs;
+
+                    var parent = Polymer.dom(this).parentNode;
+                    var flid = _featureLayerCount;
+                    _featureLayerCount += 1;
 
                     this.async(function() {
-                    var fl = this.fl
-                    var parent = Polymer.dom(this).parentNode;
 
-                    _featureLayerCount += 1;
-                    this.flid = _featureLayerCount;
-                    //console.log(parent.tagName);
-                    if (fl && parent && parent.tagName == "ESRI-MAP") {
-                        parent.featurelayerlist.push(fl);
-                        parent.featurelayerlistChange();
-                        //console.log("Adding FeatureLayer", fl);
-                    }
+                        console.log("Initialising Feature Layerr");
+                        if ( fs && parent && parent.tagName == "ESRI-MAP") {
+                            parent.featurelayerlist.push(fs);
+                            parent.featurelayerlistChange();
+                            console.log("Adding FeatureLayer", fs, fs.renderer, parent.map);
 
-                }) // end of async
+                        }
 
-                }
+                });// end of async
+                } // End of attached
             });  // End of Polymer
 
 

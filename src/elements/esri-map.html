@@ -26,7 +26,6 @@
                     position: relative;
                     width: 100% !important;
                     height: 100% !important;
-
                 }
 
                 .esri-zoombox {
@@ -203,13 +202,8 @@
                     var webmapid = this.webmapid;
                     var wkid = new SpatialReference({ wkid : 4326 }); //WGS84
 
-                    // A necessary listener - see: https://github.com/webcomponents/webcomponentsjs#webcomponentsready
-                    // See also: https://github.com/Polymer/polymer/issues/1381
-
-
                     // Defining by Web Map ID - Check the web map Id is not undefined or blank
                     if (selectorId && webmapid) {
-
 
                         // Create map from web map ID
                         arcgisUtils.createMap(webmapid, selectorId, { minZoom: 2, maxZoom: 16 } ).then( function(returnedMap) {
@@ -270,17 +264,17 @@
 
                 zoomChange: function(newZoom, oldZoom) {
 
-                    //console.log("zoom changed", newZoom)
-                    //console.log(newZoom, this.map, parseInt(newZoom) != parseInt(oldZoom))
-                    if (newZoom && this.map && parseInt(newZoom) != parseInt(oldZoom) ) {
+
+                    if (newZoom && this.map && parseInt(newZoom) != parseInt(oldZoom) && newZoom) {
 
                         if (typeof(newZoom) == "string") {
                             newZoom = this.cleanZoomInput(newZoom);
                             var newZoom = parseInt(newZoom);
-                            console.log("changing zoom level to: ", newZoom)
+                        //    console.log("changing zoom level to: ", newZoom)
                             this.map.setZoom(newZoom);
                         }
                         else if (typeof(newZoom) == "number") {
+                        //    console.log("num changing zoom level to: ", newZoom)
                             this.map.setZoom(newZoom);
                         }
                     }
@@ -289,18 +283,13 @@
 
                 latChange: function(newLat, oldLat) {
 
-                    //console.log("zoom changed", newZoom)
-                    //console.log(newZoom, this.map, parseInt(newZoom) != parseInt(oldZoom))
-                    //console.log(newLat , this.map , newLat != oldLat );
-
                     if (newLat && this.map && newLat != oldLat ) {
                         var coordsDiff = newLat.toFixed(7) != oldLat.toFixed(7);
                         if (typeof(newLat) == "string") {
                             newLat = this.cleanZoomInput(newLat);
                             newLat = parseFloat(newLat);
-                            //console.log(newLat);
-                            if (newLat > -90 && newLat < 90) {
 
+                            if (newLat > -90 && newLat < 90) {
                                 this.map.centerAt(newLat);
                             }
                         }
@@ -313,18 +302,13 @@
 
                 lngChange: function(newLng, oldLng) {
 
-                    //console.log("zoom changed", newZoom)
-                    //console.log(newZoom, this.map, parseInt(newZoom) != parseInt(oldZoom))
-                    //console.log(newLng , this.map , newLng != oldLng );
-
                     if (newLng && this.map && newLng != oldLng ) {
                         var coordsDiff = newLng.toFixed(7) != oldLng.toFixed(7);
                         if (typeof(newLng) == "string") {
                             newLng = this.cleanZoomInput(newLng);
                             newLng = parseFloat(newLng);
-                            //console.log(newLng);
+
                             if (newLng > -90 && newLng < 90) {
-                                //console.log("string and changing lat to: ", newLng)
                                 this.map.centerAt(newLng);
                             }
                         }
@@ -338,8 +322,8 @@
                 },
 
                 extentChange: function(newExtent, oldExtent) {
-
-                    if (newExtent && this.map) {
+                    var repeat = (newExtent && oldExtent && newExtent.xmin != oldExtent.xmin && newExtent.ymin != oldExtent.ymin && newExtent.xmax != oldExtent.xmax && newExtent.ymax != oldExtent.ymax);
+                    if (this.map && repeat) {
 
                         var min = webMercatorUtils.webMercatorToGeographic(new Point( newExtent.xmin, newExtent.ymin) )
                         var max = webMercatorUtils.webMercatorToGeographic(new Point( newExtent.xmax, newExtent.ymax) )
@@ -352,50 +336,43 @@
                         if ( this.zoom != this.map.getZoom() ) {
                             this.zoom = this.map.getZoom();
                         }
-                        //console.log("New Bounding Box: ", this.boundingBox);
+                        //wconsole.log("New Bounding Box: ", this.boundingBox);
                     }
 
                 },
 
                 boundingBoxChange: function(newBoundingBox, oldBoundingBox) {
 
-                    if (newBoundingBox && this.map) {
-                        //console.log(newBoundingBox);
+                    if (newBoundingBox && this.map && newBoundingBox != oldBoundingBox) {
                         var bb = newBoundingBox.split(", ");
                         if (isNaN(bb[0]) == false && isNaN(bb[1]) == false && isNaN(bb[2]) == false && isNaN(bb[3]) == false) {
                             var newExtent = new Extent( bb[0], bb[1], bb[2], bb[3], this.wkid  );
                             this.map.setExtent(newExtent);
-                            //console.log("New Extent", newExtent);
                         }
                     }
 
                 },
 
-
-
                 featurelayerlistChange: function() {
 
                     var featurelayerlist = this.featurelayerlist;
                     var map = this.map;
+                    var context = this;
 
                     if (map && featurelayerlist.length > 0) {
 
                         var featureService = featurelayerlist.pop();
-                        var fl = new FeatureLayer(
-                                          featureService,
-                                          {
-                                            mode: FeatureLayer.MODE_SNAPSHOT,
-                                            outFields: ["*"]
-                                          }
-                                          );
-                        //console.log(fl);
-                        map.on("load", function() {
-                            //console.log("adding!" ,fl);
-                            map.addLayer(fl)
-                        });
-                        this.defaultPopupFeatureLayer(fl);
+                        var fl = new FeatureLayer( featureService, {
+                                                    mode : FeatureLayer.MODE_SNAPSHOT,
+                                                    outFields: ["*"]
+                                                });
+                            map.addLayer(fl);
+                            //fl.setOpacity(1.0);
+                            console.log("Adding FeatureLayer", fl, fl.renderer);
+                            context.defaultPopupFeatureLayer(fl);
 
                     }
+
                 },
 
                 addmarkerChange: function() {

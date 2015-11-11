@@ -45,8 +45,6 @@
                     var parent = Polymer.dom(this).parentNode;
                     var marker = ["", "", ""];
 
-                    // ASYNC REQUIRED! -- https://github.com/Polymer/polymer/issues/1699
-                    this.async(function() {
 
                     if (parent.tagName == "ESRI-MAP" ) {
                         if (typeof(markerlng) == "number" && typeof(markerlat) == "number") {
@@ -70,7 +68,6 @@
                             _markerId += 1;
                         }
                     }
-                })
                 });
             },
 
