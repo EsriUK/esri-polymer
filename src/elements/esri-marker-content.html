@@ -20,14 +20,14 @@
 
                 attached: function() {
                     var component = this;
-                    window.addEventListener("WebComponentsReady", function(){
-                    component.async(function() {
+                    window.addEventListener('WebComponentsReady', function(e) {
+                    this.async(function() {
 
                     //console.log("This marker has a marker content");
-                    var parentComponent = Polymer.dom(component).parentNode;
-                    var target = Polymer.dom(component).node;
+                    var parent = Polymer.dom(this).parentNode;
+                    var target = Polymer.dom(this).node;
 
-                    var map = parentComponent.map;
+                    var map = Polymer.dom(parent).parentNode.map;
                     var markerid = parent.markerid;
                     //console.log(map, markerid)
 
@@ -54,7 +54,7 @@
                     }
 
                     }); //end of async
-                    });
+                }); // webcomponetns ready
                 },
 
                 detached :  function() {
