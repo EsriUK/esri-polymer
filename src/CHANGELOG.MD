@@ -1,5 +1,9 @@
 Esri Polymer - Change Log
 
+v 1.3.0
+* Upgraded to Polymer v1.2.1
+* Fixed cross browser issues using WebComponentsReady
+* Upgraded to ArcGIS JavaScript API 3.15
 
 v 1.2.0
 * Upgraded to Polymer v1.1.5 (from v1.0.2)
