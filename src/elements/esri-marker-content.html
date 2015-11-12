@@ -21,11 +21,11 @@
                 attached: function() {
                     var component = this;
                     window.addEventListener('WebComponentsReady', function(e) {
-                    this.async(function() {
+                    component.async(function() {
 
                     //console.log("This marker has a marker content");
-                    var parent = Polymer.dom(this).parentNode;
-                    var target = Polymer.dom(this).node;
+                    var parent = Polymer.dom(component).parentNode;
+                    var target = Polymer.dom(component).node;
 
                     var map = Polymer.dom(parent).parentNode.map;
                     var markerid = parent.markerid;
