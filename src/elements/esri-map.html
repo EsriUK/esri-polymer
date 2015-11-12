@@ -165,14 +165,8 @@
                         value: ' 0, 0, 0, 0',
                         observer: 'boundingBoxChange',
                         reflectToAttribute: false
-                    },
-                    addmarker : {
-                        type: Array,
-                        value : [],
-                        observer: 'addmarkerChange',
-                        reflectToAttribute: false
-                        //notify : true
                     }
+
                 },
 
                 attached: function() {
@@ -182,7 +176,6 @@
 
                     // Establish variables
                     var context = this;
-                    var addmarker = this.addmarker;
                     var zoom = this.zoom;
                     var minZoom = this.minZoom;
                     var maxZoom = this.maxZoom;
@@ -362,14 +355,13 @@
                     }
                 },
 
-                addmarkerChange: function() {
+                addMarker: function(markerArray) {
 
-                    if (this.map && this.addmarker && this.addmarker.length === 1 ) {
+                    if ( this.map && markerArray ) {
 
                         var map = this.map;
                         var wkid = this.wkid;
                         var markerImg = './imgs/esriGreenPin.png';
-                        var markerArray = this.addmarker.pop();
                         var marker = markerArray[0]
                         var markerId = markerArray[1];
 
