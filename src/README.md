@@ -20,8 +20,16 @@ It currently supports:
 
 ![Esri Polymer Screenshot](https://raw.githubusercontent.com/JamesMilnerUK/esri-polymer/master/src/screenshot.png "Esri Polymer Screenshot")
 
-#
 #Getting Started
+
+To setup this project follow these instructions:
+
+    bower install
+    // Also optionally use live server to serve the demo
+    npm install -g live-server
+    live-server
+
+If you haven't installed bower you can use npm install -g bower:
 
 An example of using esri-polymer is shown in the esri-polymer.html page in the repository. Usage is as so:
 

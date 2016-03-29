@@ -107,7 +107,6 @@
             ],
             function(Map, InfoTemplate, PictureMarkerSymbol, GraphicsLayer, Graphic, FeatureLayer, arcgisUtils, Extent, SpatialReference, webMercatorUtils, Point) {
 
-            console.log("init polymer");
             var mapIdCount = 0; //Static instance counter for creating new selector Ids
 
             Polymer({
@@ -193,7 +192,7 @@
 
                         // Create map from web map ID
                         arcgisUtils.createMap(webmapid, selectorId, { minZoom: 2, maxZoom: 16 } ).then( function(returnedMap) {
-                            // console.log("Initialising map");
+    
                             var fl;
                             context.map = returnedMap.map;
 

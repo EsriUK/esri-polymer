@@ -1,0 +1,13 @@
+{
+  "name": "dgrid",
+  "homepage": "https://github.com/Esri/dgrid",
+  "_release": "0.3.17/esri-3.14.0",
+  "_resolution": {
+    "type": "tag",
+    "tag": "0.3.17/esri-3.14.0",
+    "commit": "1d4a6e71fcd8af8b3b0a8f88d2c9d52d87c294ef"
+  },
+  "_source": "git://github.com/Esri/dgrid.git",
+  "_target": "0.3.17/esri-3.14.0",
+  "_originalSource": "Esri/dgrid"
+}

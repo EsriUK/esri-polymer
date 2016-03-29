@@ -39,14 +39,12 @@
                     window.addEventListener('WebComponentsReady', function(e) {
                     component.async(function() {
 
-                        console.log("Initialising Feature Layerr");
                         if ( fs && parent && parent.tagName == "ESRI-MAP") {
                             parent.addFeatureLayer(fs);
-                            console.log("Adding FeatureLayer", fs, fs.renderer, parent.map);
-
+                            //console.log("Adding FeatureLayer", fs, fs.renderer, parent.map);
                         }
 
-                });// end of async
+                }); // end of async
                 }); // WebComponentsReady
                 } // End of attached
             });  // End of Polymer

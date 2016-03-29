@@ -1,0 +1,13 @@
+{
+  "name": "dojo",
+  "homepage": "https://github.com/Esri/dojo",
+  "_release": "v1.10.4/esri-3.14.0",
+  "_resolution": {
+    "type": "tag",
+    "tag": "v1.10.4/esri-3.14.0",
+    "commit": "358808cce1d1e27eaf19d8f13084b2121a8e47b5"
+  },
+  "_source": "git://github.com/Esri/dojo.git",
+  "_target": "v1.10.4/esri-3.14.0",
+  "_originalSource": "Esri/dojo"
+}

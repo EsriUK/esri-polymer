@@ -1,0 +1,13 @@
+{
+  "name": "dgauges",
+  "homepage": "https://github.com/dmandrioli/dgauges",
+  "_release": "f4cee2a00f",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "f4cee2a00f58585450b705481925f680c388f007"
+  },
+  "_source": "git@github.com:dmandrioli/dgauges.git",
+  "_target": "*",
+  "_originalSource": "git@github.com:dmandrioli/dgauges.git"
+}
