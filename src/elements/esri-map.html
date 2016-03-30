@@ -33,10 +33,10 @@
                     font-family: 'Nunito', sans-serif;
                     height: 29px !important;
                     width: 29px !important;
-                    border-radius: 4px;
+                    border-radius: 5px;
                     position: absolute;
                     top: 85px;
-                    left: 21px;
+                    left: 20px;
                     text-align: center;
                     border: rgba(13, 13, 13, 0.84);
                     border-width: 1px;
@@ -159,6 +159,14 @@
                         observer: 'zoomChange',
                         reflectToAttribute: true
                     },
+                    minZoom : {
+                        type : Number,
+                        value : 2
+                    },
+                    maxZoom : {
+                        type : Number,
+                        value : 16
+                    },
                     boundingBox : {
                         type: String,
                         value: ' 0, 0, 0, 0',
@@ -191,8 +199,14 @@
                     if (selectorId && webmapid) {
 
                         // Create map from web map ID
-                        arcgisUtils.createMap(webmapid, selectorId, { minZoom: 2, maxZoom: 16 } ).then( function(returnedMap) {
-    
+                        arcgisUtils.createMap(webmapid, selectorId, {
+                          mapOptions : {
+                              zoom: zoom,
+                              minZoom: minZoom,
+                              maxZoom: maxZoom
+                          }
+                         }).then( function(returnedMap) {
+
                             var fl;
                             context.map = returnedMap.map;
 
@@ -220,8 +234,8 @@
                             basemap: basemap,
                             center: [centerLng, centerLat], // longitude, latitude
                             zoom: zoom,
-                            minZoom: 2,
-                            maxZoom: 16,
+                            minZoom: context.minZoom,
+                            maxZoom: context.maxZoom,
                             SpatialReference: wkid
                         });
 
@@ -251,19 +265,21 @@
 
                 zoomChange: function(newZoom, oldZoom) {
 
-
-                    if (newZoom && this.map && parseInt(newZoom) != parseInt(oldZoom) && newZoom) {
+                    if (this.map && parseInt(newZoom) != parseInt(oldZoom)) {
 
                         if (typeof(newZoom) == "string") {
-                            newZoom = this.cleanZoomInput(newZoom);
-                            var newZoom = parseInt(newZoom);
-                        //    console.log("changing zoom level to: ", newZoom)
+                            newZoom = parseInt(this.cleanZoomInput(newZoom));
+                        }
+                        if (newZoom => this.minZoom && newZoom <= this.maxZoom) {
                             this.map.setZoom(newZoom);
                         }
-                        else if (typeof(newZoom) == "number") {
-                        //    console.log("num changing zoom level to: ", newZoom)
-                            this.map.setZoom(newZoom);
+                        else if (newZoom < this.minZoom) {
+                            this.map.setZoom(this.minZoom);
                         }
+                        else if (newZoom > this.maxZoom) {
+                            this.map.setZoom(this.maxZoom);
+                        }
+
                     }
 
                 },
