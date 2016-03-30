@@ -29,6 +29,20 @@ It currently supports:
 
 #Getting Started
 
+Install bower if you haven't already using npm:
+
+    npm install -g bower
+
+Install bower components
+
+    bower install
+
+Live serve the demo if you so wish (optional):
+
+    npm install live-server
+    cd src
+    live-server
+
 An example of using esri-polymer is shown in the esri-polymer.html page in the repository. Usage is as so:
 
    ```html
