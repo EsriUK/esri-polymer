@@ -270,7 +270,7 @@
                         if (typeof(newZoom) == "string") {
                             newZoom = parseInt(this.cleanZoomInput(newZoom));
                         }
-                        if (newZoom => this.minZoom && newZoom <= this.maxZoom) {
+                        if (newZoom >= this.minZoom && newZoom <= this.maxZoom) {
                             this.map.setZoom(newZoom);
                         }
                         else if (newZoom < this.minZoom) {
